@@ -24,4 +24,8 @@ public class JobConstants {
 	public static final String JOB_PAGE_LIST = getProp(JobConstants.APPLICATION, JobConstants.AppKey.ADDRESSES) + "/jobinfo/pageList";
 
 	public static final String JOB_START = getProp(JobConstants.APPLICATION, JobConstants.AppKey.ADDRESSES) + "/jobinfo/start";
+	
+	public static final String JOB_STOP = getProp(JobConstants.APPLICATION, JobConstants.AppKey.ADDRESSES) + "/jobinfo/stop";
+	
+	public static final String JOB_DELETE = getProp(JobConstants.APPLICATION, JobConstants.AppKey.ADDRESSES) + "/jobinfo/remove";
 }

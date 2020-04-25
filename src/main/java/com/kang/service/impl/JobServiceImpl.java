@@ -1,13 +1,12 @@
-package com.chao.job;
+package com.kang.service.impl;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-
 import com.kang.common.constans.JobConstants;
 import com.kang.model.XxlJobInfo;
+import com.kang.service.JobService;
 
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
@@ -17,20 +16,16 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 
-public class JobTest {
-	
-	/**
-	 * <p>Title: testAddJob</p>
-	 * <p>Description: 添加任务</p>
-	 * @param
-	 */
-	@Test
-	public void testAddJob() {
+public class JobServiceImpl implements JobService{
+
+	@Override
+	public Boolean add(XxlJobInfo jobInfo) {
+
 		Map<String,Object> formMap = MapUtil.builder(new HashMap<String,Object>())
 			.put("jobGroup", 1)
 			.put("jobDesc", "测试任务2")
 			.put("executorRouteStrategy", "FIRST")
-			.put("jobCron", "0 0 0 * * ? *")
+			.put("jobCron", jobInfo.getJobCron())
 			.put("glueType", "BEAN")
 			.put("executorHandler", "demoJobHandler")
 			.put("executorBlockStrategy", "SERIAL_EXECUTION")
@@ -50,59 +45,66 @@ public class JobTest {
 			.cookie(toLogin())
 			.form(formMap)
 			.execute();
-		
-		Console.log(httpResponse.getStatus());
-		Console.log(httpResponse.isOk());
-		Console.log(httpResponse.body());
+		return httpResponse.isOk();
 	}
-	
-	/**
-	 * <p>Title: testPageList</p>
-	 * <p>Description: 查看任务列表</p>
-	 * @param
-	 */
-	@Test
-	public void testPageList() {
+
+	@Override
+	public List<XxlJobInfo> pageList(XxlJobInfo jobInfo) {
 		Map<String,Object> paramMap = Dict.create().set("jobGroup", 1).set("start", 0).set("length", 10);
 		HttpResponse httpResponse = HttpRequest.post(JobConstants.JOB_PAGE_LIST)
 				.contentType("application/x-www-form-urlencoded; charset=UTF-8")
 				.cookie(toLogin())
 				.form(paramMap)
 				.execute();
-		Console.log("httpResponse:{}",httpResponse);
 		Map<String,Object> bodyMap = JSONUtil.toBean(httpResponse.body(), new TypeReference<Map<String,Object>>() {}, true);
-		List<XxlJobInfo> list = MapUtil.get(bodyMap, "data", new TypeReference<List<XxlJobInfo>>() {});
-		Console.log("list:{}",list);
+		return MapUtil.get(bodyMap, "data", new TypeReference<List<XxlJobInfo>>() {});
 	}
 	
+	@Override
+	public Boolean start(XxlJobInfo jobInfo) {
+		Map<String,Object> paramMap = Dict.create().set("id", jobInfo.getId());
+		HttpResponse httpResponse = HttpRequest.post(JobConstants.JOB_START)
+				.contentType("application/x-www-form-urlencoded; charset=UTF-8")
+				.cookie(toLogin())
+				.form(paramMap)
+				.execute();
+		return httpResponse.isOk();
+	}
 	
-	/**
-	 * <p>Title: toLogin</p>
-	 * <p>Description: xxl-job登录</p>
-	 * @param @return
-	 */
+	@Override
+	public Boolean stop(XxlJobInfo jobInfo) {
+		Map<String,Object> paramMap = Dict.create().set("id", jobInfo.getId());
+		HttpResponse httpResponse = HttpRequest.post(JobConstants.JOB_STOP)
+				.contentType("application/x-www-form-urlencoded; charset=UTF-8")
+				.cookie(toLogin())
+				.form(paramMap)
+				.execute();
+		return httpResponse.isOk();
+	}
+	
+	@Override
+	public Boolean delete(XxlJobInfo jobInfo) {
+		Map<String,Object> paramMap = Dict.create().set("id", jobInfo.getId());
+		HttpResponse httpResponse = HttpRequest.post(JobConstants.JOB_DELETE)
+				.contentType("application/x-www-form-urlencoded; charset=UTF-8")
+				.cookie(toLogin())
+				.form(paramMap)
+				.execute();
+		return httpResponse.isOk();
+	}
+	
+	@Override
 	public String toLogin() {
 		Map<String,Object> paramMap = Dict.create().set("userName", JobConstants.AppKey.USER).set("password", JobConstants.AppKey.PASSWORD);
 		HttpResponse httpResponse = HttpRequest.post(JobConstants.JOB_LOGIN)
 				.form(paramMap)
 				.execute();
 		if(httpResponse.getStatus() == 200) {
-			Console.log(httpResponse.getCookieStr());
 			return httpResponse.getCookieStr();
 		}
 		return null;
 	}
-	
-	@Test
-	public void testStart() {
-		Map<String,Object> paramMap = Dict.create().set("id", 2);
-		HttpResponse httpResponse = HttpRequest.post(JobConstants.JOB_DELETE)
-				.contentType("application/x-www-form-urlencoded; charset=UTF-8")
-				.cookie(toLogin())
-				.form(paramMap)
-				.execute();
-		Console.log(httpResponse.isOk());
-	}
-	
-}
 
+	
+
+}

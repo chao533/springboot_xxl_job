@@ -24,6 +24,13 @@
 			<artifactId>hutool-all</artifactId>
 			<version>5.3.1</version>
 		</dependency>
+		
+		<!-- lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.xuxueli</groupId>
